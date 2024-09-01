@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()  # This loads the variables from .env
 
-app = Flask(__name__, static_folder="static/build", static_url_path="")
+app = Flask(__name__, static_folder='static/build', template_folder='static/build')
 CORS(app)
 app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
@@ -30,15 +30,22 @@ def fetch_player_list():
 
 @app.route('/api/hello', methods=['GET'])
 def hello():
+    print("API /hello endpoint called")
     return jsonify(message="Hello from the backend!")
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
-    if path != "" and os.path.exists(app.static_folder + '/' + path):
+    print(f"Requested path: {path}")
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        print(f"Serving static file: {path}")
         return send_from_directory(app.static_folder, path)
     else:
-        return send_from_directory(app.static_folder, 'index.html')
+        print(f"Serving index.html from {app.template_folder}")
+        with open(os.path.join(app.template_folder, 'index.html'), 'r') as f:
+            content = f.read()
+            print(f"index.html content: {content[:100]}...")  # Print first 100 characters
+        return send_from_directory(app.template_folder, 'index.html')
 
 @app.route('/api/players', methods=['GET'])
 def get_players():
@@ -105,6 +112,15 @@ def process_and_evaluate_players(players):
     # Your existing optimization logic here
     # You may need to adjust this based on the data structure from your new API
     pass
+
+@app.route('/static/build/static/js/main.072a731b.js')
+def serve_js():
+    print("Serving JavaScript file")
+    return send_from_directory('static/build/static/js', 'main.072a731b.js')
+
+@app.route('/api/check', methods=['GET'])
+def check():
+    return jsonify({"status": "Server is running"}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

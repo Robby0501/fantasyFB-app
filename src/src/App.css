@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #2552ad;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -26,6 +26,48 @@
 
 .App-link {
   color: #61dafb;
+}
+
+/* Updated styles for the search bar and results */
+.search-container {
+  width: 80%;
+  max-width: 600px;
+  margin: 20px auto;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 15px;
+  font-size: 18px;
+  border: 2px solid #61dafb;
+  border-radius: 8px;
+  outline: none;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 2px solid #61dafb;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.search-result-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  color: #333;
+  text-align: left;
+}
+
+.search-result-item:hover {
+  background-color: #f0f0f0;
 }
 
 @keyframes App-logo-spin {

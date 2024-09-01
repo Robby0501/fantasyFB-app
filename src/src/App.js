@@ -15,7 +15,6 @@ function App() {
       .then(data => setMessage(data.message))
       .catch(error => console.error('Error fetching message:', error));
 
-    // Fetch all players when the component mounts
     fetch('/api/all-players')
       .then(response => response.json())
       .then(data => {
@@ -36,7 +35,7 @@ function App() {
       const results = allPlayers.filter(player => 
         player.playerName.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setSearchResults(results.slice(0, 10));  // Limit to 10 results
+      setSearchResults(results.slice(0, 10));
     } else {
       setSearchResults([]);
     }
@@ -45,6 +44,7 @@ function App() {
   const addPlayer = (player) => {
     setSelectedPlayers([...selectedPlayers, player]);
     setSearchQuery("");
+    setSearchResults([]);
   };
 
   const removePlayer = (playerToRemove) => {
@@ -56,23 +56,29 @@ function App() {
       <header className="App-header">
         <p>{message}</p>
         <h2>Search and Add Players</h2>
-        <input 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search players"
-        />
+        <div className="search-container">
+          <input 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search players"
+            className="search-input"
+          />
+          {searchResults.length > 0 && (
+            <div className="search-results-container">
+              <div className="search-results">
+                {searchResults.map((player, index) => (
+                  <div key={index} className="search-result-item" onClick={() => addPlayer(player)}>
+                    {player.playerName} - {player.position} - {player.teamName} - Age: {player.age}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
         {error && <p style={{color: 'red'}}>{error}</p>}
-        <ul>
-          {searchResults.map((player, index) => (
-            <li key={index}>
-              {player.playerName} - {player.position} - {player.teamName} - Age: {player.age}
-              <button onClick={() => addPlayer(player)}>Add</button>
-            </li>
-          ))}
-        </ul>
 
         <h2>Your Lineup</h2>
-        <ul>
+        <ul className="selected-players">
           {selectedPlayers.map((player, index) => (
             <li key={index}>
               {player.playerName} - {player.position} - {player.teamName} - Age: {player.age}
