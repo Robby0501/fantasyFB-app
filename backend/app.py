@@ -36,27 +36,20 @@ def fetch_player_list():
 
 
 @app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve(path):
-    print(f"Requested path: {path}")
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        print(f"Serving static file: {path}")
-        return send_from_directory(app.static_folder, path)
-    else:
-        print(f"Serving index.html from {app.template_folder}")
-        with open(os.path.join(app.template_folder, 'index.html'), 'r') as f:
-            content = f.read()
-            print(f"index.html content: {content[:100]}...")  # Print first 100 characters
-        return send_from_directory(app.template_folder, 'index.html')
+# @app.route('/<path:path>')
+# def serve(path):
+#     print(f"Requested path: {path}")
+#     if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+#         print(f"Serving static file: {path}")
+#         return send_from_directory(app.static_folder, path)
+#     else:
+#         print(f"Serving index.html from {app.template_folder}")
+#         with open(os.path.join(app.template_folder, 'index.html'), 'r') as f:
+#             content = f.read()
+#             print(f"index.html content: {content[:100]}...")  # Print first 100 characters
+#         return send_from_directory(app.template_folder, 'index.html')
 
-@app.route('/api/players', methods=['GET'])
-def get_players():
-    try:
-        players = fetch_player_list()
-        return jsonify(players)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+  #Fetch all players from the API
 @app.route('/api/all-players', methods=['GET'])
 def get_all_players():
     try:
@@ -99,19 +92,6 @@ def optimize_lineup():
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
-@app.route('/api/save-lineup', methods=['POST'])
-def save_lineup():
-    lineup = request.json.get('lineup', [])
-    if not lineup:
-        return jsonify({"error": "No lineup provided"}), 400
-
-    session['saved_lineup'] = lineup
-    return jsonify({"message": "Lineup saved successfully"})
-
-@app.route('/api/get-saved-lineup', methods=['GET'])
-def get_saved_lineup():
-    saved_lineup = session.get('saved_lineup', [])
-    return jsonify(saved_lineup)
 
 def process_and_evaluate_players(players):
     # Your existing optimization logic here

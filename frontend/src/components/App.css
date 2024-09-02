@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  color: black;
 }
 
 .App-logo {
@@ -14,14 +15,14 @@
 }
 
 .App-header {
-  background-color: #2552ad;
+  background-color: #f0f0f0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: black;
 }
 
 .App-link {
@@ -43,6 +44,7 @@
   border: 2px solid #61dafb;
   border-radius: 8px;
   outline: none;
+  color: black;
 }
 
 .search-results {
@@ -62,7 +64,7 @@
 .search-result-item {
   padding: 10px 15px;
   cursor: pointer;
-  color: #333;
+  color: black;
   text-align: left;
 }
 
@@ -77,4 +79,82 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.league-settings-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.league-settings-form div {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.league-settings-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: black;
+}
+
+.league-settings-form input,
+.league-settings-form select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: black;
+}
+
+.league-settings-form button {
+  padding: 10px 20px;
+  background-color: #61dafb;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.league-settings-form button:hover {
+  background-color: #21a1c9;
+}
+
+.selected-players {
+  list-style-type: none;
+  padding: 0;
+}
+
+.selected-players li {
+  background-color: #ffffff;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.selected-players button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.selected-players button:hover {
+  background-color: #ff3333;
 }
