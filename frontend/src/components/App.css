@@ -62,14 +62,23 @@
 }
 
 .search-result-item {
-  padding: 10px 15px;
-  cursor: pointer;
-  color: black;
-  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.search-result-item:hover {
-  background-color: #f0f0f0;
+.search-result-item button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 2px 5px;
+  border-radius: 2px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.search-result-item button:hover {
+  background-color: #45a049;
 }
 
 @keyframes App-logo-spin {
@@ -81,22 +90,26 @@
   }
 }
 
-.league-settings-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 80%;
-  max-width: 600px;
-  margin: 20px auto;
+.league-settings {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 20px;
+}
+
+.league-settings-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  width: 100%;
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
 }
 
-.league-settings-form div {
+.league-settings-form > div {
   width: 100%;
-  margin-bottom: 15px;
 }
 
 .league-settings-form label {
@@ -117,6 +130,7 @@
 }
 
 .league-settings-form button {
+  grid-column: 1 / -1;
   padding: 10px 20px;
   background-color: #61dafb;
   color: white;
@@ -124,10 +138,19 @@
   border-radius: 4px;
   font-size: 18px;
   cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  margin: 20px auto 0;
 }
 
 .league-settings-form button:hover {
   background-color: #21a1c9;
+}
+
+.starters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
 }
 
 .selected-players {
@@ -157,4 +180,60 @@
 
 .selected-players button:hover {
   background-color: #ff3333;
+}
+
+.error-message {
+  color: #ff0000;
+  background-color: #ffeeee;
+  border: 1px solid #ff0000;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.lineup {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.position-group {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.player-slot {
+  margin: 5px 0;
+  padding: 5px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.player-slot button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 2px 5px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.player-slot button:hover {
+  background-color: #ff3333;
+}
+
+.search-result-item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.search-result-item:hover {
+  background-color: #f0f0f0;
 }
