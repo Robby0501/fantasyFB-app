@@ -8,7 +8,7 @@ function PlayerSearch() {
   const [selectedPlayers, setSelectedPlayers] = useState({});
   const [error, setError] = useState(null);
 
-  const location = useLocation();
+  const location = useLocation(); 
   const leagueSettings = location.state?.leagueSettings;
 
   useEffect(() => {
@@ -24,7 +24,6 @@ function PlayerSearch() {
   }, [leagueSettings]);
 
   useEffect(() => {
-    // Fetch all players from the backend
     fetch('http://127.0.0.1:5000/api/all-players')
       .then(response => {
         if (!response.ok) {
@@ -33,10 +32,7 @@ function PlayerSearch() {
         return response.json();
       })
       .then(data => {
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        console.log('API Response:', data); // Add this line
+        console.log('API Response:', data);
         setAllPlayers(data);
       })
       .catch(error => {
@@ -49,9 +45,9 @@ function PlayerSearch() {
     if (searchQuery.length > 1) {
       const results = allPlayers.filter(player => {
         const searchableNames = [
-          player.longName,
-          player.espnName,
-          player.playerName
+          player.playerName,
+          player.teamName,
+          player.position
         ].filter(Boolean);
         return searchableNames.some(name =>
           name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -62,18 +58,15 @@ function PlayerSearch() {
       setSearchResults([]);
     }
   }, [searchQuery, allPlayers]);
-  
+
   const addPlayer = (player) => {
-    // Determine the position based on available properties
     let position = player.position.toLowerCase();
     
-    // If position is still not available, use a default
     if (!position) {
       console.warn(`Position not found for player: ${player.playerName}`);
       position = 'flex';
     }
   
-
     setSelectedPlayers(prev => {
       const newSelectedPlayers = {...prev};
       
@@ -125,7 +118,6 @@ function PlayerSearch() {
     setSearchResults([]);
   };
 
-  // Helper function to check if a position is compatible with a slot
   const isCompatiblePosition = (playerPosition, slotPosition) => {
     const positionMap = {
       'qb': ['qb'],
@@ -157,15 +149,15 @@ function PlayerSearch() {
           placeholder="Search players"
           className="search-input"
         />
-        {searchResults.length > 0 && (
+      {searchResults.length > 0 && (
   <div className="search-results">
     {searchResults.map((player, index) => (
-  <div key={index} className="search-result-item" onClick={() => addPlayer(player)}>
-    {player.playerName} - {player.position} - {player.teamName}
+      <div key={index} className="search-result-item" onClick={() => addPlayer(player)}>
+        {player.playerName} - {player.position} - {player.teamName}
+      </div>
+    ))}
   </div>
-))}
-          </div>
-        )}
+)}
       </div>
       {error && <p className="error-message">{error}</p>}
       <h2>Your Lineup</h2>

@@ -74,6 +74,14 @@ def get_all_players():
             }
             for player in player_list
         ]
+
+        # Add team defenses
+        team_defenses = [
+            {'playerName': f'{team} D/ST', 'position': 'DEF', 'teamName': team}
+            for team in ['ARI', 'ATL', 'BAL', 'BUF', 'CAR', 'CHI', 'CIN', 'CLE', 'DAL', 'DEN', 'DET', 'GB', 'HOU', 'IND', 'JAX', 'KC', 'LAC', 'LAR', 'LV', 'MIA', 'MIN', 'NE', 'NO', 'NYG', 'NYJ', 'PHI', 'PIT', 'SEA', 'SF', 'TB', 'TEN', 'WAS']
+        ]
+        processed_players.extend(team_defenses)
+
         return jsonify(processed_players)
     except Exception as e:
         print("Error in get_all_players:", str(e))
