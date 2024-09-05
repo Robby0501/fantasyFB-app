@@ -62,23 +62,13 @@
 }
 
 .search-result-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.search-result-item button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 2px 5px;
-  border-radius: 2px;
+  padding: 10px;
   cursor: pointer;
-  margin-left: 5px;
+  border-bottom: 1px solid #eee;
 }
 
-.search-result-item button:hover {
-  background-color: #45a049;
+.search-result-item:hover {
+  background-color: #f0f0f0;
 }
 
 @keyframes App-logo-spin {
@@ -228,6 +218,80 @@
   background-color: #ff3333;
 }
 
+.roster {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.roster-header {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.player-search-input {
+  width: 100%;
+  padding: 15px;
+  font-size: 18px;
+  border: 2px solid #61dafb;
+  border-radius: 8px 8px 0 0;
+  outline: none;
+  color: black;
+  margin-bottom: 0;
+  box-sizing: border-box;
+}
+
+.player-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  color: white;
+  background-color: #808080; /* Default color if team not found */
+}
+
+.player-name {
+  font-weight: bold;
+}
+
+.player-details {
+  font-size: 0.8em;
+}
+
+.remove-player {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
+.search-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  position: relative;
+}
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 2px solid #61dafb;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .search-result-item {
   padding: 10px;
   cursor: pointer;
@@ -236,4 +300,90 @@
 
 .search-result-item:hover {
   background-color: #f0f0f0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .search-container {
+    width: 90%;
+  }
+
+  .search-results {
+    width: 18.7em;
+  }
+
+  .roster {
+    width: 90%;
+  }
+
+  .player-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .player-details {
+    font-size: 1em;
+  }
+
+  .remove-player {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-input {
+    padding: 10px;
+    font-size: 16px;
+  }
+
+  .search-result-item {
+    padding: 8px;
+  }
+
+  .roster-header {
+    font-size: 1em;
+  }
+
+  .player-item {
+    padding: 8px;
+  }
+
+  .player-name {
+    font-size: 1em;
+  }
+
+  .player-details {
+    font-size: 0.8em;
+  }
+
+  .remove-player {
+    font-size: 1em;
+  }
+  .search-container {
+    width: 90%;
+    padding: 0;
+  }
+
+  .player-search-input {
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  .search-results {
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .search-container {
+    width: 90%;
+  }
+
+  .search-results {
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
 }

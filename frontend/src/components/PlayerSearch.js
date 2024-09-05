@@ -8,6 +8,17 @@ function PlayerSearch() {
   const [selectedPlayers, setSelectedPlayers] = useState({});
   const [error, setError] = useState(null);
 
+  const teamColors = {
+    ARI: '#97233F', ATL: '#A71930', BAL: '#241773', BUF: '#00338D',
+    CAR: '#0085CA', CHI: '#C83803', CIN: '#FB4F14', CLE: '#311D00',
+    DAL: '#003594', DEN: '#FB4F14', DET: '#0076B6', GB: '#203731',
+    HOU: '#03202F', IND: '#002C5F', JAX: '#006778', KC: '#E31837',
+    LAC: '#0080C6', LAR: '#003594', LV: '#000000', MIA: '#008E97',
+    MIN: '#4F2683', NE: '#002244', NO: '#D3BC8D', NYG: '#0B2265',
+    NYJ: '#125740', PHI: '#004C54', PIT: '#FFB612', SEA: '#002244',
+    SF: '#AA0000', TB: '#D50A0A', TEN: '#0C2340', WAS: '#773141'
+  };
+
   const location = useLocation(); 
   const leagueSettings = location.state?.leagueSettings;
 
@@ -49,7 +60,8 @@ function PlayerSearch() {
           player.teamName,
           player.position
         ].filter(Boolean);
-        return searchableNames.some(name =>
+        const isValidPosition = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'].includes(player.position.toUpperCase());
+        return isValidPosition && searchableNames.some(name =>
           name.toLowerCase().includes(searchQuery.toLowerCase())
         );
       });
@@ -74,12 +86,12 @@ function PlayerSearch() {
       const isPlayerAlreadyAdded = Object.values(newSelectedPlayers).some(
         players => players.some(p => p && p.playerName === player.playerName)
       );
-
+  
       if (isPlayerAlreadyAdded) {
         console.warn(`Player ${player.playerName} is already in the lineup.`);
         return prev;
       }
-
+  
       // First, try to add to the exact position
       if (newSelectedPlayers[position] && newSelectedPlayers[position].includes(null)) {
         const index = newSelectedPlayers[position].indexOf(null);
@@ -95,25 +107,20 @@ function PlayerSearch() {
             break;
           }
         }
-
-        // If still not added, try to add to FLEX or BENCH
-        if (!added) {
-          if (newSelectedPlayers['FLEX'] && newSelectedPlayers['FLEX'].includes(null)) {
-            const index = newSelectedPlayers['FLEX'].indexOf(null);
-            newSelectedPlayers['FLEX'][index] = player;
-          } else if (newSelectedPlayers['BENCH'] && newSelectedPlayers['BENCH'].includes(null)) {
-            const index = newSelectedPlayers['BENCH'].indexOf(null);
-            newSelectedPlayers['BENCH'][index] = player;
-          } else {
-            console.warn(`No available slots for player: ${player.playerName}`);
-            return prev;
-          }
+  
+        // If still not added, try to add to BENCH
+        if (!added && newSelectedPlayers['BENCH'] && newSelectedPlayers['BENCH'].includes(null)) {
+          const index = newSelectedPlayers['BENCH'].indexOf(null);
+          newSelectedPlayers['BENCH'][index] = player;
+        } else if (!added) {
+          console.warn(`No available slots for player: ${player.playerName}`);
+          return prev;
         }
       }
-
+  
       return newSelectedPlayers;
     });
-
+  
     setSearchQuery("");
     setSearchResults([]);
   };
@@ -127,7 +134,7 @@ function PlayerSearch() {
       'k': ['k'],
       'def': ['def']
     };
-
+  
     return positionMap[playerPosition]?.includes(slotPosition.toLowerCase()) || false;
   };
 
@@ -140,46 +147,45 @@ function PlayerSearch() {
   };
 
   return (
-    <div className="player-search">
-      <h2>Search and Add Players</h2>
+    <div className="roster">
+      <h2 className="roster-header">ROSTER</h2>
+      <p>Add your 9 starters & all bench players, in any order.</p>
       <div className="search-container">
-        <input 
+        <input
+          type="text"
+          className="player-search-input"
+          placeholder="Player search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search players"
-          className="search-input"
         />
-      {searchResults.length > 0 && (
-  <div className="search-results">
-    {searchResults.map((player, index) => (
-      <div key={index} className="search-result-item" onClick={() => addPlayer(player)}>
-        {player.playerName} - {player.position} - {player.teamName}
-      </div>
-    ))}
-  </div>
-)}
-      </div>
-      {error && <p className="error-message">{error}</p>}
-      <h2>Your Lineup</h2>
-      <div className="lineup">
-        {Object.entries(selectedPlayers).map(([position, players]) => (
-          <div key={position} className="position-group">
-            <h3>{position}</h3>
-            {players.map((player, index) => (
-              <div key={`${position}-${index}`} className="player-slot">
-                {player ? (
-                  <>
-                    <span>{player.playerName} - {player.position} - {player.teamName}</span>
-                    <button onClick={() => removePlayer(position, index)}>Remove</button>
-                  </>
-                ) : (
-                  <span>Empty Slot</span>
-                )}
+        {searchResults.length > 0 && (
+          <div className="search-results">
+            {searchResults.map((player, index) => (
+              <div key={index} className="search-result-item" onClick={() => addPlayer(player)}>
+                {player.playerName} - {player.position} - {player.teamName}
               </div>
             ))}
           </div>
-        ))}
+        )}
       </div>
+      {Object.entries(selectedPlayers).map(([position, players]) =>
+        players.map((player, index) => (
+          player && (
+            <div 
+              key={`${position}-${index}`} 
+              className="player-item"
+              style={{ backgroundColor: teamColors[player.teamName] || '#808080' }}
+            >
+              <div>
+                <div className="player-name">{player.playerName}</div>
+                <div className="player-details">{player.position} • {player.teamName}</div>
+              </div>
+              <button className="remove-player" onClick={() => removePlayer(position, index)}>×</button>
+            </div>
+          )
+        ))
+      )}
+      {error && <p className="error-message">{error}</p>}
     </div>
   );
 }

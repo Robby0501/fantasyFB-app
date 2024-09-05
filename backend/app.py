@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()  # This loads the variables from .env
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://127.0.0.1:3000", "http://localhost:3000"])
+CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}})
 
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SECRET_KEY'] = 'your_secret_key_here'  # Replace with a real secret key
@@ -73,6 +73,7 @@ def get_all_players():
                 'espnPlayerId': player.get('espnID', '')
             }
             for player in player_list
+            if player.get('pos') in ['QB', 'RB', 'WR', 'TE', 'K']  # Only include specific positions
         ]
 
         # Add team defenses
