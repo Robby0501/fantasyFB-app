@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function PlayerSearch() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -7,6 +7,8 @@ function PlayerSearch() {
   const [searchResults, setSearchResults] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState({});
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   const teamColors = {
     ARI: { primary: '#97233F', secondary: '#000000' },
@@ -40,10 +42,11 @@ function PlayerSearch() {
     SEA: { primary: '#002244', secondary: '#69BE28' },
     TB: { primary: '#D50A0A', secondary: '#34302B' },
     TEN: { primary: '#0C2340', secondary: '#4B92DB' },
-    WAS: { primary: '#5A1414', secondary: '#FFB612' }
+    WSH: { primary: '#5A1414', secondary: '#FFB612' }
   };
 
   function isLightColor(color) {
+    if (!color) return false;
     const hex = color.replace('#', '');
     const r = parseInt(hex.substr(0, 2), 16);
     const g = parseInt(hex.substr(2, 2), 16);
@@ -56,14 +59,14 @@ function PlayerSearch() {
   const leagueSettings = location.state?.leagueSettings;
 
   useEffect(() => {
-    // Initialize selectedPlayers based on leagueSettings
     if (leagueSettings) {
       const initialSelectedPlayers = {};
       Object.entries(leagueSettings.starters).forEach(([position, count]) => {
-        initialSelectedPlayers[position] = Array(count).fill(null);
+        initialSelectedPlayers[position.toUpperCase()] = Array(parseInt(count)).fill(null);
       });
-      initialSelectedPlayers['BENCH'] = Array(leagueSettings.benchSpots).fill(null);
+      initialSelectedPlayers['BENCH'] = Array(parseInt(leagueSettings.benchSpots)).fill(null);
       setSelectedPlayers(initialSelectedPlayers);
+      console.log('Initial selectedPlayers:', initialSelectedPlayers);
     }
   }, [leagueSettings]);
 
@@ -105,13 +108,8 @@ function PlayerSearch() {
   }, [searchQuery, allPlayers]);
 
   const addPlayer = (player) => {
-    let position = player.position.toLowerCase();
+    let position = player.position.toUpperCase();
     
-    if (!position) {
-      console.warn(`Position not found for player: ${player.playerName}`);
-      position = 'flex';
-    }
-  
     setSelectedPlayers(prev => {
       const newSelectedPlayers = {...prev};
       
@@ -125,31 +123,45 @@ function PlayerSearch() {
         return prev;
       }
   
-      // First, try to add to the exact position
-      if (newSelectedPlayers[position] && newSelectedPlayers[position].includes(null)) {
-        const index = newSelectedPlayers[position].indexOf(null);
-        newSelectedPlayers[position][index] = player;
-      } else {
-        // If exact position is full or doesn't exist, try to add to a compatible position
-        let added = false;
-        for (const [key, players] of Object.entries(newSelectedPlayers)) {
-          if (isCompatiblePosition(position, key) && players.includes(null)) {
-            const index = players.indexOf(null);
-            newSelectedPlayers[key][index] = player;
-            added = true;
-            break;
-          }
-        }
+      // Count total players currently in the lineup
+      const totalPlayers = Object.values(newSelectedPlayers).flat().filter(Boolean).length;
+      const maxPlayers = Object.values(newSelectedPlayers).flat().length;
   
-        // If still not added, try to add to BENCH
-        if (!added && newSelectedPlayers['BENCH'] && newSelectedPlayers['BENCH'].includes(null)) {
+      if (totalPlayers >= maxPlayers) {
+        console.warn(`Maximum number of players (${maxPlayers}) reached.`);
+        return prev;
+      }
+  
+      // Handle kicker position separately
+      if (position === 'PK' || position === 'K') {
+        if (newSelectedPlayers['K'] && newSelectedPlayers['K'].includes(null)) {
+          const index = newSelectedPlayers['K'].indexOf(null);
+          newSelectedPlayers['K'][index] = player;
+        } else {
+          console.warn(`No available kicker slot for player: ${player.playerName}`);
+          return prev;
+        }
+      } else {
+        // For other positions, use the existing logic
+        if (newSelectedPlayers[position] && newSelectedPlayers[position].includes(null)) {
+          const index = newSelectedPlayers[position].indexOf(null);
+          newSelectedPlayers[position][index] = player;
+        } else if (isCompatiblePosition(position, 'FLEX') && newSelectedPlayers['FLEX'] && newSelectedPlayers['FLEX'].includes(null)) {
+          const index = newSelectedPlayers['FLEX'].indexOf(null);
+          newSelectedPlayers['FLEX'][index] = player;
+        } else if (newSelectedPlayers['BENCH'] && newSelectedPlayers['BENCH'].includes(null)) {
           const index = newSelectedPlayers['BENCH'].indexOf(null);
           newSelectedPlayers['BENCH'][index] = player;
-        } else if (!added) {
+        } else {
           console.warn(`No available slots for player: ${player.playerName}`);
           return prev;
         }
       }
+  
+      console.log('Adding player:', player);
+      console.log('Current selectedPlayers:', newSelectedPlayers);
+      console.log('Total players:', totalPlayers);
+      console.log('Max players:', maxPlayers);
   
       return newSelectedPlayers;
     });
@@ -164,7 +176,8 @@ function PlayerSearch() {
       'rb': ['rb', 'flex'],
       'wr': ['wr', 'flex'],
       'te': ['te', 'flex'],
-      'pk': ['pk'],
+      'pk': ['k'],
+      'k': ['k'],
       'def': ['def']
     };
   
@@ -177,6 +190,25 @@ function PlayerSearch() {
       newSelectedPlayers[position][index] = null;
       return newSelectedPlayers;
     });
+  };
+  const handleOptimizeLineup = () => {
+    const players = Object.values(selectedPlayers).flat().filter(Boolean);
+    
+    fetch('http://127.0.0.1:5000/api/optimize-lineup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ players }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        navigate('/optimized-lineup', { state: { optimizedLineup: data.optimized_lineup } });
+      })
+      .catch(error => {
+        console.error('Error optimizing lineup:', error);
+        setError('An error occurred while optimizing the lineup. Please try again later.');
+      });
   };
 
   return (
@@ -202,33 +234,34 @@ function PlayerSearch() {
         )}
       </div>
       <div className="roster-grid">
-        {Object.entries(selectedPlayers).flatMap(([position, players]) =>
-          players.map((player, index) => (
-            player && (
-              <div 
-                key={`${position}-${index}`} 
-                className="player-item"
-                style={{ backgroundColor: teamColors[player.teamName]?.primary || '#808080' }}
-              >
-                <div className="player-info">
-                  <div className="player-name">{player.playerName}</div>
-                  <div 
-                    className="player-details" 
-                    style={{ 
-                      backgroundColor: teamColors[player.teamName]?.secondary || '#666666',
-                      color: isLightColor(teamColors[player.teamName]?.secondary) 
-                        ? teamColors[player.teamName]?.primary 
-                        : 'white'
-                    }}
-                  >
-                    <span>{player.position} • {player.teamName}</span>
-                  </div>
-                </div>
-                <button className="remove-player" onClick={() => removePlayer(position, index)}>×</button>
-              </div>
-            )
-          ))
-        )}
+      {Object.entries(selectedPlayers).flatMap(([position, players]) =>
+  players.map((player, index) => (
+    player && (
+      <div 
+        key={`${position}-${index}`} 
+        className="player-item"
+        style={{ backgroundColor: teamColors[player.teamName]?.primary || '#808080' }}
+      >
+        <div className="player-info">
+          <div className="player-name">{player.playerName}</div>
+          <div 
+            className="player-details" 
+            style={{ 
+              backgroundColor: teamColors[player.teamName]?.secondary || '#666666',
+              color: isLightColor(teamColors[player.teamName]?.secondary) ? '#000000' : '#FFFFFF'
+            }}
+          >
+            <span>{player.position} • {player.teamName}</span>
+          </div>
+        </div>
+        <button className="remove-player" onClick={() => removePlayer(position, index)}>×</button>
+      </div>
+    )
+  ))
+)}
+        <button onClick={handleOptimizeLineup} className="optimize-button">
+  Optimize Lineup
+</button>
       </div>
       {error && <p className="error-message">{error}</p>}
     </div>
