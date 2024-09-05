@@ -73,7 +73,7 @@ def get_all_players():
                 'espnPlayerId': player.get('espnID', '')
             }
             for player in player_list
-            if player.get('pos') in ['QB', 'RB', 'WR', 'TE', 'K']  # Only include specific positions
+            if player.get('pos') in ['QB', 'RB', 'WR', 'TE', 'PK','DEF']  # Only include specific positions
         ]
 
         # Add team defenses

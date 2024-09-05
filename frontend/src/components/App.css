@@ -220,9 +220,16 @@
 
 .roster {
   width: 100%;
-  max-width: 600px;
+  max-width: 1200px;
   margin: 0 auto;
   position: relative;
+}
+
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  padding: 10px;
 }
 
 .roster-header {
@@ -245,29 +252,48 @@
 
 .player-item {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  margin-bottom: 5px;
   border-radius: 5px;
   color: white;
-  background-color: #808080; /* Default color if team not found */
+  overflow: hidden;
+  height: 80px;
+  position: relative;
+}
+
+.player-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .player-name {
+  padding: 5px;
   font-weight: bold;
+  font-size: 0.9em;
 }
 
 .player-details {
-  font-size: 0.8em;
+  padding: 3px 5px;
+  font-size: 0.7em;
+  text-transform: uppercase;
 }
 
 .remove-player {
+  position: absolute;
+  top: 2px;
+  right: 2px;
   background: none;
   border: none;
-  color: white;
-  font-size: 1.2em;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1em;
   cursor: pointer;
+  padding: 2px;
+  line-height: 1;
+}
+
+.remove-player:hover {
+  color: white;
 }
 
 .search-container {

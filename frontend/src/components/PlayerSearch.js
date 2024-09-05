@@ -9,15 +9,48 @@ function PlayerSearch() {
   const [error, setError] = useState(null);
 
   const teamColors = {
-    ARI: '#97233F', ATL: '#A71930', BAL: '#241773', BUF: '#00338D',
-    CAR: '#0085CA', CHI: '#C83803', CIN: '#FB4F14', CLE: '#311D00',
-    DAL: '#003594', DEN: '#FB4F14', DET: '#0076B6', GB: '#203731',
-    HOU: '#03202F', IND: '#002C5F', JAX: '#006778', KC: '#E31837',
-    LAC: '#0080C6', LAR: '#003594', LV: '#000000', MIA: '#008E97',
-    MIN: '#4F2683', NE: '#002244', NO: '#D3BC8D', NYG: '#0B2265',
-    NYJ: '#125740', PHI: '#004C54', PIT: '#FFB612', SEA: '#002244',
-    SF: '#AA0000', TB: '#D50A0A', TEN: '#0C2340', WAS: '#773141'
+    ARI: { primary: '#97233F', secondary: '#000000' },
+    ATL: { primary: '#A71930', secondary: '#000000' },
+    BAL: { primary: '#241773', secondary: '#000000' },
+    BUF: { primary: '#00338D', secondary: '#C60C30' },
+    CAR: { primary: '#0085CA', secondary: '#101820' },
+    CHI: { primary: '#0B162A', secondary: '#C83803' },
+    CIN: { primary: '#FB4F14', secondary: '#000000' },
+    CLE: { primary: '#311D00', secondary: '#FF3C00' },
+    DAL: { primary: '#003594', secondary: '#869397' },
+    DEN: { primary: '#FB4F14', secondary: '#002244' },
+    DET: { primary: '#0076B6', secondary: '#B0B7BC' },
+    GB: { primary: '#203731', secondary: '#FFB612' },
+    HOU: { primary: '#03202F', secondary: '#A71930' },
+    IND: { primary: '#002C5F', secondary: '#FFFFFF' },
+    JAX: { primary: '#006778', secondary: '#000000' },
+    KC: { primary: '#E31837', secondary: '#FFB81C' },
+    LV: { primary: '#A5ACAF', secondary: '#000000' },
+    LAC: { primary: '#0080C6', secondary: '#FFC20E' },
+    LAR: { primary: '#003594', secondary: '#FFA300' },
+    MIA: { primary: '#008E97', secondary: '#FC4C02' },
+    MIN: { primary: '#4F2683', secondary: '#FFC62F' },
+    NE: { primary: '#002244', secondary: '#C60C30' },
+    NO: { primary: '#D3BC8D', secondary: '#101820' },
+    NYG: { primary: '#0B2265', secondary: '#A71930' },
+    NYJ: { primary: '#125740', secondary: '#FFFFFF' },
+    PHI: { primary: '#004C54', secondary: '#A5ACAF' },
+    PIT: { primary: '#000000', secondary: '#FFB612' },
+    SF: { primary: '#AA0000', secondary: '#B3995D' },
+    SEA: { primary: '#002244', secondary: '#69BE28' },
+    TB: { primary: '#D50A0A', secondary: '#34302B' },
+    TEN: { primary: '#0C2340', secondary: '#4B92DB' },
+    WAS: { primary: '#5A1414', secondary: '#FFB612' }
   };
+
+  function isLightColor(color) {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return brightness > 155;
+  }
 
   const location = useLocation(); 
   const leagueSettings = location.state?.leagueSettings;
@@ -60,7 +93,7 @@ function PlayerSearch() {
           player.teamName,
           player.position
         ].filter(Boolean);
-        const isValidPosition = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'].includes(player.position.toUpperCase());
+        const isValidPosition = ['QB', 'RB', 'WR', 'TE', 'PK', 'DEF'].includes(player.position.toUpperCase());
         return isValidPosition && searchableNames.some(name =>
           name.toLowerCase().includes(searchQuery.toLowerCase())
         );
@@ -131,11 +164,11 @@ function PlayerSearch() {
       'rb': ['rb', 'flex'],
       'wr': ['wr', 'flex'],
       'te': ['te', 'flex'],
-      'k': ['k'],
+      'pk': ['pk'],
       'def': ['def']
     };
   
-    return positionMap[playerPosition]?.includes(slotPosition.toLowerCase()) || false;
+    return positionMap[playerPosition.toLowerCase()]?.includes(slotPosition.toLowerCase()) || false;
   };
 
   const removePlayer = (position, index) => {
@@ -168,23 +201,35 @@ function PlayerSearch() {
           </div>
         )}
       </div>
-      {Object.entries(selectedPlayers).map(([position, players]) =>
-        players.map((player, index) => (
-          player && (
-            <div 
-              key={`${position}-${index}`} 
-              className="player-item"
-              style={{ backgroundColor: teamColors[player.teamName] || '#808080' }}
-            >
-              <div>
-                <div className="player-name">{player.playerName}</div>
-                <div className="player-details">{player.position} • {player.teamName}</div>
+      <div className="roster-grid">
+        {Object.entries(selectedPlayers).flatMap(([position, players]) =>
+          players.map((player, index) => (
+            player && (
+              <div 
+                key={`${position}-${index}`} 
+                className="player-item"
+                style={{ backgroundColor: teamColors[player.teamName]?.primary || '#808080' }}
+              >
+                <div className="player-info">
+                  <div className="player-name">{player.playerName}</div>
+                  <div 
+                    className="player-details" 
+                    style={{ 
+                      backgroundColor: teamColors[player.teamName]?.secondary || '#666666',
+                      color: isLightColor(teamColors[player.teamName]?.secondary) 
+                        ? teamColors[player.teamName]?.primary 
+                        : 'white'
+                    }}
+                  >
+                    <span>{player.position} • {player.teamName}</span>
+                  </div>
+                </div>
+                <button className="remove-player" onClick={() => removePlayer(position, index)}>×</button>
               </div>
-              <button className="remove-player" onClick={() => removePlayer(position, index)}>×</button>
-            </div>
-          )
-        ))
-      )}
+            )
+          ))
+        )}
+      </div>
       {error && <p className="error-message">{error}</p>}
     </div>
   );
