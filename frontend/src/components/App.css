@@ -328,6 +328,31 @@
   background-color: #f0f0f0;
 }
 
+.optimize-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.optimize-button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.optimize-button:hover {
+  background-color: #45a049;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .search-container {

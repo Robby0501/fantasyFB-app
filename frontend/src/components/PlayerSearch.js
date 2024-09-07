@@ -259,9 +259,11 @@ function PlayerSearch() {
     )
   ))
 )}
+        <div className="optimize-button-container">
         <button onClick={handleOptimizeLineup} className="optimize-button">
-  Optimize Lineup
-</button>
+          Optimize Lineup
+        </button>
+      </div>
       </div>
       {error && <p className="error-message">{error}</p>}
     </div>
