@@ -9,6 +9,7 @@ import requests
 from datetime import datetime, timedelta
 import logging
 
+
 load_dotenv()  # This loads the variables from .env
 
 logging.basicConfig(level=logging.DEBUG)
@@ -95,7 +96,7 @@ def fetch_projections(week):
         "passYards": ".04",
         "passAttempts": "-.5",
         "passTD": "4",
-        "passCompletions": "1",
+        "passCompletions": "1", 
         "passInterceptions": "-2",
         "pointsPerReception": "1",
         "carries": ".2",

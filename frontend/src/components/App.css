@@ -329,9 +329,11 @@
 }
 
 .optimize-button-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
 }
 
 .optimize-button {
